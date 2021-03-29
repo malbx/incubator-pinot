@@ -48,7 +48,7 @@ import org.testng.annotations.Test;
 public class ServerTableSizeReaderTest {
   private static final Logger LOGGER = LoggerFactory.getLogger(ServerTableSizeReader.class);
 
-  private final ExecutorService executor = Executors.newFixedThreadPool(3);
+  private final ExecutorService executor = Executors.newCachedThreadPool();
   private final HttpConnectionManager httpConnectionManager = new MultiThreadedHttpConnectionManager();
   private final String URI_PATH = "/table/";
   private final List<TestHttpServerMock> servers = new ArrayList<>();
@@ -66,6 +66,7 @@ public class ServerTableSizeReaderTest {
   @BeforeClass
   public void setUp()
       throws IOException {
+    ((MultiThreadedHttpConnectionManager) httpConnectionManager).setMaxConnectionsPerHost(20);
     for (int i = 0; i < serverCount; i++) {
       serverList.add("server_" + i);
     }

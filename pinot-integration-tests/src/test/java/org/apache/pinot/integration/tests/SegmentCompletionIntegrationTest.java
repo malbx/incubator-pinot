@@ -76,15 +76,15 @@ public class SegmentCompletionIntegrationTest extends BaseClusterIntegrationTest
   public void setUp()
       throws Exception {
     TestUtils.ensureDirectoriesExistAndEmpty(_tempDir);
-    // Start the Pinot cluster
-    startZk();
 
+    // Start Zookeeper
+    startZk();
     // Start Kafka
     startKafka();
-
+    // Start the Pinot cluster
     startController();
     startBroker();
-    startFakeServer();
+    startServer();
 
     // Create and upload the schema and table config
     addSchema(createSchema());
@@ -103,7 +103,7 @@ public class SegmentCompletionIntegrationTest extends BaseClusterIntegrationTest
 
     // Create server instance with the fake server state model
     _serverHelixManager = HelixManagerFactory
-        .getZKHelixManager(getHelixClusterName(), _serverInstance, InstanceType.PARTICIPANT, ZkStarter.DEFAULT_ZK_STR);
+        .getZKHelixManager(getHelixClusterName(), _serverInstance, InstanceType.PARTICIPANT, ZkStarter.getDefaultZkStr());
     _serverHelixManager.getStateMachineEngine()
         .registerStateModelFactory(SegmentOnlineOfflineStateModelFactory.getStateModelName(),
             new FakeServerSegmentStateModelFactory());
@@ -199,7 +199,6 @@ public class SegmentCompletionIntegrationTest extends BaseClusterIntegrationTest
   @AfterClass
   public void tearDown() throws IOException {
     dropRealtimeTable(getTableName());
-    dropOfflineTable(getTableName());
     // Stop the Pinot cluster
     stopFakeServer();
     stopBroker();
